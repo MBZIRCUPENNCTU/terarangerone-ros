@@ -123,7 +123,7 @@ void TerarangerOne::serialDataCallback(uint8_t single_character)
         int16_t range = input_buffer[1] << 8;
         range |= input_buffer[2];
 
-        if (range < 14000 && range > 200)
+        if (range < 14000 && range >= 0)
         {
           range_msg.header.stamp = ros::Time::now();
           range_msg.header.seq = seq_ctr++;
