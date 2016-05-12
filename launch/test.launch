@@ -1,0 +1,7 @@
+<launch>
+	<node name="teraranger" pkg="terarangerone" type="terarangerone_node" output="screen">
+				<remap from="terarangerone" to="~range" />
+				<param name="portname" value="/dev/teraranger" />
+	</node>
+</launch>
+
