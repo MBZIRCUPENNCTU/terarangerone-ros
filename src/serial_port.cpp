@@ -95,13 +95,28 @@ bool SerialPort::connect(const std::string port)
 void SerialPort::disconnect()
 {
   serial_thread_should_exit_ = true;
+
   // TODO(lfr) wait for thread to finish
-  close(serial_port_fd_);
+	try {
+  	
+		close(serial_port_fd_);
+	}
+	catch (int e) {
+
+		ROS_WARN("Error while closing the teraranger serial line!");
+	}
 }
 
 bool SerialPort::sendChar(const char c)
 {
-  return write(serial_port_fd_, (const void*)&c, 1);
+	try {
+  
+		return write(serial_port_fd_, (const void*)&c, 1);
+	}
+	catch (int e) {
+	
+		ROS_WARN("Error while writing from teraranger serial line!");
+	}
 }
 
 void SerialPort::setSerialCallbackFunction(boost::function<void(uint8_t)> * f)
@@ -115,10 +130,16 @@ void SerialPort::serialThread()
   // Non read
   while (!serial_thread_should_exit_ && ros::ok())
   {
-    if (read(serial_port_fd_, &single_character, 1))
-    {
-      (*serial_callback_function)(single_character);
-    }
+		try {
+   		
+			if (read(serial_port_fd_, &single_character, 1)) {
+
+   	  	(*serial_callback_function)(single_character);
+   	 	}
+		}
+		catch (int e) {
+			ROS_WARN("Error while reading from teraranger serial line!");
+		}
     ros::Duration(0.0001).sleep();
   }
   return;
