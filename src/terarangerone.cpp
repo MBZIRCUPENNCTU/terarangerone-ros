@@ -222,8 +222,8 @@ int main(int argc, char **argv)
 			tera_bee.releaseSerialLine();
 			
 			ROS_WARN("Teraranger not responding, resetting connection...");
-		
-		  // if establishing the new connection was successfull	
+			
+			// if establishing the new connection was successfull	
 			if (tera_bee.connectToSensor() == 1) {
 			
 				ROS_WARN("New connection to Teraranger was established.");
