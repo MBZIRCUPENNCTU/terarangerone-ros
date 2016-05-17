@@ -74,6 +74,9 @@ TerarangerOne::TerarangerOne()
   // Dynamic reconfigure
   dyn_param_server_callback_function_ = boost::bind(&TerarangerOne::dynParamCallback, this, _1, _2);
   dyn_param_server_.setCallback(dyn_param_server_callback_function_);
+
+  // Set outdoor mode
+  setMode(OUTDOOR_MODE);
 }
 
 TerarangerOne::~TerarangerOne()
@@ -166,20 +169,20 @@ void TerarangerOne::dynParamCallback(const terarangerone::TerarangerOneConfig &c
 {
   if (config.Mode == terarangerone::TerarangerOne_Fast)
   {
-		ROS_DEBUG("Set to fast mode");
+		ROS_INFO("Teraranger set to fast mode.");
 		setMode(FAST_MODE);
   }
 
   if (config.Mode == terarangerone::TerarangerOne_Precise)
   {
-		ROS_DEBUG("Set to precise mode");
-    setMode(PRECISE_MODE);
+		ROS_INFO("Teraranger set to precise mode.");
+		setMode(PRECISE_MODE);
   }
  
   if (config.Mode == terarangerone::TerarangerOne_Outdoor)
   {
-		ROS_DEBUG("Set to outdoor mode");
-    setMode(OUTDOOR_MODE);
+		ROS_INFO("Teraranger set to outdoor mode.");
+		setMode(OUTDOOR_MODE);
   }
 }
 
