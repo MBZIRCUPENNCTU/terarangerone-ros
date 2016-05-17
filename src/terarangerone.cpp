@@ -38,6 +38,8 @@
 
 #include "terarangerone/terarangerone.h"
 
+#define MAXIMAL_TIME_INTERVAL 1
+
 namespace terarangerone
 {
 
@@ -57,6 +59,8 @@ TerarangerOne::TerarangerOne()
   // Dynamic reconfigure
   dyn_param_server_callback_function_ = boost::bind(&TerarangerOne::dynParamCallback, this, _1, _2);
   dyn_param_server_.setCallback(dyn_param_server_callback_function_);
+
+	connectToSensor();
 }
 
 TerarangerOne::~TerarangerOne()
@@ -213,12 +217,13 @@ int main(int argc, char **argv)
 
 		// check whether the teraranger stopped sending data
     ros::Duration interval = ros::Time::now() - tera_bee.lastReceived;
-		if (interval.toSec() < 1) {
-			
+		if (interval.toSec() > MAXIMAL_TIME_INTERVAL) {
+						
 			tera_bee.releaseSerialLine();
 			
 			ROS_WARN("Teraranger not responding, resetting connection...");
-			
+		
+		  // if establishing the new connection was successfull	
 			if (tera_bee.connectToSensor() == 1) {
 			
 				ROS_WARN("New connection to Teraranger was established.");
