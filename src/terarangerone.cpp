@@ -166,16 +166,19 @@ void TerarangerOne::dynParamCallback(const terarangerone::TerarangerOneConfig &c
 {
   if (config.Mode == terarangerone::TerarangerOne_Fast)
   {
-    setMode(FAST_MODE);
+		ROS_DEBUG("Set to fast mode");
+		setMode(FAST_MODE);
   }
 
   if (config.Mode == terarangerone::TerarangerOne_Precise)
   {
+		ROS_DEBUG("Set to precise mode");
     setMode(PRECISE_MODE);
   }
  
   if (config.Mode == terarangerone::TerarangerOne_Outdoor)
   {
+		ROS_DEBUG("Set to outdoor mode");
     setMode(OUTDOOR_MODE);
   }
 }
