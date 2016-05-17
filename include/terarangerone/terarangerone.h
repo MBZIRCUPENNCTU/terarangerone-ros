@@ -93,6 +93,11 @@ public:
   bool loadParameters();
   void setMode(char c);
 
+	uint8_t connectToSensor(void);
+	void releaseSerialLine(void);
+
+	ros::Time lastReceived;
+
   ros::NodeHandle nh_;
   ros::Publisher range_publisher_;
 

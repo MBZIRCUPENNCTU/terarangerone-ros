@@ -50,6 +50,21 @@ TerarangerOne::TerarangerOne()
   // Publishers
   range_publisher_ = nh_.advertise<sensor_msgs::Range>("terarangerone", 1);
 
+  // Output loaded parameters to console for double checking
+  ROS_INFO("[%s] is up and running with the following parameters:", ros::this_node::getName().c_str());
+  ROS_INFO("[%s] portname: %s", ros::this_node::getName().c_str(), portname_.c_str());
+
+  // Dynamic reconfigure
+  dyn_param_server_callback_function_ = boost::bind(&TerarangerOne::dynParamCallback, this, _1, _2);
+  dyn_param_server_.setCallback(dyn_param_server_callback_function_);
+}
+
+TerarangerOne::~TerarangerOne()
+{
+}
+
+uint8_t TerarangerOne::connectToSensor(void) {
+
   // Create serial port
   serial_port_ = new SerialPort();
 
@@ -60,27 +75,26 @@ TerarangerOne::TerarangerOne()
   // Connect serial port
   if (!serial_port_->connect(portname_))
   {
-    ros::shutdown();
-    return;
+		ROS_ERROR("Could not connect to Teraranger.");
+    return 0;
   }
-
-  // Output loaded parameters to console for double checking
-  ROS_INFO("[%s] is up and running with the following parameters:", ros::this_node::getName().c_str());
-  ROS_INFO("[%s] portname: %s", ros::this_node::getName().c_str(), portname_.c_str());
 
   // Set operation Mode
   setMode(BINARY_MODE);
 
-  // Dynamic reconfigure
-  dyn_param_server_callback_function_ = boost::bind(&TerarangerOne::dynParamCallback, this, _1, _2);
-  dyn_param_server_.setCallback(dyn_param_server_callback_function_);
-
   // Set outdoor mode
   setMode(OUTDOOR_MODE);
+
+	ROS_INFO("Connected to Teraranger.");	
+
+  lastReceived = ros::Time::now();
+
+	return 1;
 }
 
-TerarangerOne::~TerarangerOne()
-{
+void TerarangerOne::releaseSerialLine(void) {
+
+	delete serial_port_;
 }
 
 uint8_t TerarangerOne::crc8(uint8_t *p, uint8_t len)
@@ -132,7 +146,8 @@ void TerarangerOne::serialDataCallback(uint8_t single_character)
           range_msg.header.seq = seq_ctr++;
           range_msg.range = range * 0.001; // convert to m
           range_publisher_.publish(range_msg);
-        }
+        	lastReceived = ros::Time::now();
+				}
         ROS_DEBUG("[%s] all good %.3f m", ros::this_node::getName().c_str(), range_msg.range);
       }
       else
@@ -192,7 +207,27 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "terarangerone");
   terarangerone::TerarangerOne tera_bee;
-  ros::spin();
+  ros::Rate loop_rate(1);
+
+	while (ros::ok()) {
+
+		// check whether the teraranger stopped sending data
+    ros::Duration interval = ros::Time::now() - tera_bee.lastReceived;
+		if (interval.toSec() < 1) {
+			
+			tera_bee.releaseSerialLine();
+			
+			ROS_WARN("Teraranger not responding, resetting connection...");
+			
+			if (tera_bee.connectToSensor() == 1) {
+			
+				ROS_WARN("New connection to Teraranger was established.");
+			}
+		}
+
+		ros::spinOnce();
+		loop_rate.sleep();
+	}
 
   return 0;
 }
