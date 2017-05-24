@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   dynamic_reconfigure
 )
+
 # since we need boost search it as well
 # find_package makes the ${..._INCLUDE_DIRS} ${..._LIBRARIES} variables we use later
 find_package(Boost REQUIRED COMPONENTS system thread)
@@ -20,7 +21,7 @@ generate_dynamic_reconfigure_options(
 catkin_package(
   INCLUDE_DIRS include
   CATKIN_DEPENDS roscpp sensor_msgs std_msgs dynamic_reconfigure
-  DEPENDS boost
+  DEPENDS Boost
 )
 
 # tell catkin where to find the headers for this project
@@ -29,8 +30,6 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
 )
-
-
 
 # make the executables
 add_executable( terarangerone_node src/terarangerone.cpp src/serial_port.cpp  )
