@@ -58,7 +58,7 @@ TerarangerOne::TerarangerOne()
 
   // Dynamic reconfigure
   dyn_param_server_callback_function_ = boost::bind(&TerarangerOne::dynParamCallback, this, _1, _2);
-  dyn_param_server_.setCallback(dyn_param_server_callback_function_);
+  // dyn_param_server_.setCallback(dyn_param_server_callback_function_);
 
 	connectToSensor();
 }
